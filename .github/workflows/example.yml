@@ -1,0 +1,13 @@
+name: Hello GitHub Actions
+on: [push]
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        run: |
+          echo "Hello, world!"
+      - name: Test 2
+        run: |
+          echo "Hello, world 2!"
