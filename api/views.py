@@ -1,8 +1,4 @@
 from django.shortcuts import render
-<<<<<<< HEAD
-
-# Create your views here.
-=======
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -27,4 +23,3 @@ class BookView(APIView):
 
 # Use this in your urls.py
 book_view = BookView.as_view()
->>>>>>> 602ee9d (fix: adding new files)
