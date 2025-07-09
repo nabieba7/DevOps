@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -205,3 +206,33 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+=======
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Django
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+db.sqlite3
+*.migrations/
+
+# VSCode
+.vscode/
+
+# Environments
+.venv/
+env/
+ENV/
+
+# Pytest
+.cache/
+.pytest_cache/
+
+# OS
+.DS_Store
+
+>>>>>>> 602ee9d (fix: adding new files)
