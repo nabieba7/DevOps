@@ -1,65 +1,92 @@
-name: Run the unit tests
+name: CI Pipeline
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
   push:
-    branches:
-      - main
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  PYTHON_VERSION: '3.13'
 
 jobs:
   test:
+    name: Run Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/install-dependencies
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run pytest
+      - name: Install dependencies
         run: |
-          pytest
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-  runmigrations:
+      - name: Run pytest with coverage
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+        run: |
+          pytest --cov=./ --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+
+  migrations:
+    name: Database Migrations
     runs-on: ubuntu-latest
+    needs: test
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/install-dependencies
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run Django migrate
+      - name: Install dependencies
         run: |
-          python manage.py migrate
+          pip install -r requirements.txt
 
-  runmigrations-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - uses: ./.github/actions/install-dependencies
-
-      - name: Check for missing migrations
+      - name: Check migrations
         run: |
-          python manage.py makemigrations --check
+          python manage.py makemigrations --check --dry-run
 
-  build-docker-image:
+  build:
+    name: Build and Push
     runs-on: ubuntu-latest
-    needs: [test, runmigrations, runmigrations-check]
+    needs: [test, migrations]
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -68,17 +95,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Build and push 
-        uses: docker/build-push-action@v6
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
           context: .
-          tags: ${{ steps.meta.outputs.tags }}
           push: true
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-     
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
