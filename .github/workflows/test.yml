@@ -31,7 +31,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: ./.github/actions/install-dependencies
+      - uses: ./.github/actions/install-dependencies.yml
 
       - name: Run Django migrate
         run: |
@@ -43,7 +43,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: ./.github/actions/install-dependencies
+      - uses: ./.github/actions/install-dependencies.yml
 
       - name: Check for missing migrations
         run: |
