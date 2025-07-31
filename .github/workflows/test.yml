@@ -8,76 +8,71 @@ on:
     branches:
       - main
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: ./.github/actions/install-dependencies
 
       - name: Run pytest
-        run: |
-          pytest
+        run: pytest
 
   runmigrations:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: ./.github/actions/install-dependencies
 
-      - name: Run Django migrate
-        run: |
-          python manage.py migrate
+      - name: Run django migrate
+        run: python manage.py migrate
 
-  runmigrations-check:
+  migrations-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: ./.github/actions/install-dependencies
 
-      - name: Check for missing migrations
-        run: |
-          python manage.py makemigrations --check
+      - name: Run makemigrations
+        run: python manage.py makemigrations --check
 
   build-docker-image:
     runs-on: ubuntu-latest
-    needs: [test, runmigrations, runmigrations-check]
+    needs:
+      - test
+      - runmigrations
+      - migrations-check
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Login to GHCR
+      - name: Login to GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker metadata
+      - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ghcr.io/${{ github.repository }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          tags: ${{ steps.meta.outputs.tags }}
           push: true
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

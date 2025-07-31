@@ -17,4 +17,10 @@ spec:
       containers:
       - image: nginxdemos/hello
         name: nginx-containrer
-        
+        volumeMounts:
+        - name: pvc-volume
+          mountPath: /cache
+      volumes:
+      - name: pvc-volume
+        persistentVolumeClaim:
+          claimName: my-volume
