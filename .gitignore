@@ -236,3 +236,5 @@ ENV/
 .DS_Store
 
 >>>>>>> 602ee9d (fix: adding new files)
+books-catalog-chart/templates/secrets.yaml
+books-catalog-chart/values-secret.yaml
