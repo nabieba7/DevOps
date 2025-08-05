@@ -14,6 +14,12 @@ class HealthView(APIView):
 # Use this in your urls.py
 health_view = HealthView.as_view()
 
+class TestView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "test": "ok",
+        })
+test_view = TestView.as_view()
 
 # Create your views here.
 
