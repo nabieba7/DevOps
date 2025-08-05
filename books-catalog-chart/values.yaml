@@ -12,6 +12,10 @@ image:
 # This will be used to configure the Deployment so it can pull the image
 imagePullSecrets: []
 
+# 👇 Add this block
+service:
+  port: 80
+
 ingress:
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
