@@ -1,4 +1,3 @@
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -10,13 +9,16 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
   rules:
     - http:
-      paths:
-        - path: /api
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "books-catalog-chart.fullname" . }}
-              port:
-                number: 80
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "books-catalog-chart.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
