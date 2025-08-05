@@ -21,4 +21,4 @@ spec:
               service:
                 name: {{ include "books-catalog-chart.fullname" . }}
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ .Values.service.port | default 80 }}
