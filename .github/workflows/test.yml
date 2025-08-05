@@ -138,8 +138,8 @@ jobs:
         uses: fjogeleit/yaml-update-action@main
         with:
           valueFile: 'envs/prod/values.yaml'
-          property: 'image.tag'
+          propertyPath: 'image.tag'
           value: ${{ needs.semantic-release.outputs.new-release-version }}
           branch: main
-          commitComment: true
           message: 'Update image tag to v${{ needs.semantic-release.outputs.new-release-version }}'
+      
