@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/nabieba7/DevOps/compare/v1.1.0...v1.2.0) (2025-08-05)
+
+### Features
+
+*  adding new very important endpoint ([7f75b26](https://github.com/nabieba7/DevOps/commit/7f75b26ca612ee83546b03c6a101cd6e10288ee5))
+
 ## [1.1.0](https://github.com/nabieba7/DevOps/compare/v1.0.0...v1.1.0) (2025-08-05)
 
 ### Features
