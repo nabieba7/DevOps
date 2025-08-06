@@ -9,6 +9,7 @@ class Book(models.Model):
         validators=[MinLengthValidator(13)],
         unique=True
     )
+    description = models.TextField()  
     published_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
