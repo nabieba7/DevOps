@@ -1,11 +1,13 @@
-from django.urls import re_path
-from .views import book_view, health_view, test_view
+from rest_framework.routers import DefaultRouter
+from .views import BookViewSet, health_view, test_view, book_view
+from django.urls import path, include
 
-app_name = 'api'
+router = DefaultRouter()
+router.register(r'books', BookViewSet, basename='book')  # This creates the 'book-list' and 'book-detail' patterns
 
 urlpatterns = [
-    re_path(r'^books/', book_view, name='books'),
-    re_path(r'^test/', test_view, name='test'),
-    re_path(r'^$', health_view, name='health'),  # Fixed this line
+    path('health/', health_view),
+    path('test/', test_view),
+    path('books-api/', book_view),  # optional: using your custom BookView
+    path('', include(router.urls)),  # 🔑 Make sure this line is present
 ]
-

@@ -1,8 +1,8 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Book  # Assuming you have a Book model defined in models.py
-from .serializers import BookSerializer  # Assuming you have a BookSerializer defined in serializers.py
+from .serializers import BookSerializer
+from rest_framework import viewsets# Assuming you have a BookSerializer defined in serializers.py
 
 
 class HealthView(APIView):
@@ -22,6 +22,9 @@ class TestView(APIView):
 test_view = TestView.as_view()
 
 # Create your views here.
+class BookViewSet(viewsets.ModelViewSet):
+    queryset = Book.objects.all().order_by('-created_at')
+    serializer_class = BookSerializer
 
 class BookView(APIView):
     """  List all books , or creat a new book            """
@@ -38,6 +41,8 @@ class BookView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+    
 
 # Use this in your urls.py
 book_view = BookView.as_view()
